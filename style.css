@@ -1,124 +1,151 @@
-// ================= API =================
-const API_URL = "/data";
+/* ================= RESET ================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
 
-// 🔊 Alert Sound
-const alertSound = new Audio("https://www.soundjay.com/buttons/beep-01a.mp3");
+/* ================= BACKGROUND MAGIC ================= */
+body {
+  background: radial-gradient(circle at 20% 20%, #0ea5e9, transparent 40%),
+              radial-gradient(circle at 80% 80%, #9333ea, transparent 40%),
+              linear-gradient(135deg, #020617, #0f172a);
+  color: #fff;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: all 0.6s ease;
+}
 
-// ================= FETCH FUNCTION =================
-async function fetchData() {
-  try {
-    const res = await fetch(API_URL);
-    const data = await res.json();
+/* 🔥 GLOW BLOBS */
+body::before, body::after {
+  content: "";
+  position: fixed;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  filter: blur(120px);
+  z-index: -1;
+}
 
-    console.log(data);
+body::before {
+  background: #22c55e;
+  top: 10%;
+  left: 10%;
+}
 
-    // ================= TRUST + RISK =================
-    document.getElementById("score").innerText = data.trust_score + "%";
-    document.getElementById("risk").innerText = data.risk_score + "%";
-    document.getElementById("status").innerText = data.status;
+body::after {
+  background: #3b82f6;
+  bottom: 10%;
+  right: 10%;
+}
 
-    const statusEl = document.getElementById("status");
-    const body = document.getElementById("body");
+/* ================= TITLE ================= */
+h2 {
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(255,255,255,0.2);
+}
 
-    // ================= STATUS TEXT COLOR =================
-    if (data.status === "DANGER") {
-      statusEl.className = "text-danger";
-    } else if (data.status === "WARNING") {
-      statusEl.className = "text-warning";
-    } else {
-      statusEl.className = "text-success";
-    }
+/* ================= GLASS CARD ================= */
+.card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+  border-radius: 20px;
+  padding: 20px;
+  margin: 15px 0;
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  transition: all 0.4s ease;
+}
 
-    // ================= BACKGROUND MODE =================
-    body.classList.remove("safe", "warning", "danger");
-    body.classList.add(data.status.toLowerCase());
+.card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+}
 
-    // 🔊 SOUND ONLY WHEN DANGER
-    if (data.status === "DANGER") {
-      alertSound.play();
-    }
+/* ================= RISK ================= */
+#risk {
+  font-size: 36px;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(255,255,255,0.3);
+}
 
-    // ================= ALERTS =================
-    let alertBox = document.getElementById("alerts");
-    alertBox.innerHTML = "";
+/* ================= STATUS COLORS ================= */
+.text-success { color: #22c55e !important; }
+.text-warning { color: #facc15 !important; }
+.text-danger { color: #ef4444 !important; }
 
-    data.alerts.forEach(alert => {
-      alertBox.innerHTML += `<div class="alert alert-warning">${alert}</div>`;
-    });
+/* ================= ALERT ================= */
+.alert {
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 0, 0, 0.15);
+  border: 1px solid rgba(255, 0, 0, 0.3);
+  animation: fadeIn 0.5s ease;
+}
 
-    // ================= AI EXPLANATION =================
-    let reasonsList = document.getElementById("reasons");
-    reasonsList.innerHTML = "";
+/* ================= LIST ================= */
+.list-group-item {
+  background: rgba(255,255,255,0.05) !important;
+  border-radius: 10px;
+  margin-bottom: 5px;
+}
 
-    data.reasons.forEach(r => {
-      reasonsList.innerHTML += `<li class="list-group-item bg-dark text-white">${r}</li>`;
-    });
+/* ================= BUTTONS ================= */
+button {
+  border-radius: 12px !important;
+  transition: 0.3s;
+  backdrop-filter: blur(5px);
+}
 
-    // ================= SYSTEM ACTION =================
-    document.getElementById("action").innerText = data.action;
+button:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 15px rgba(255,255,255,0.3);
+}
 
-    // ================= APPS =================
-    let appSection = document.getElementById("apps");
-    appSection.innerHTML = "";
+/* ================= INPUT ================= */
+input {
+  background: rgba(255,255,255,0.1) !important;
+  border: none !important;
+  color: white !important;
+}
 
-    data.apps.forEach(app => {
-      appSection.innerHTML += `
-        <div class="col-md-4">
-          <div class="card bg-secondary text-white p-3 mb-3">
-            <h5>${app.name}</h5>
-            <p>Permissions: ${app.permissions.join(", ")}</p>
-            <p>Risk: ${app.risk}</p>
-            <button class="btn btn-danger btn-sm" onclick="revokeAccess('${app.name}')">Revoke</button>
-          </div>
-        </div>
-      `;
-    });
+/* ================= ANIMATIONS ================= */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-  } catch (err) {
-    console.error("Error:", err);
+/* ================= MODES ================= */
+body.safe {
+  filter: hue-rotate(120deg);
+}
+
+body.warning {
+  filter: hue-rotate(40deg);
+}
+
+body.danger {
+  filter: hue-rotate(0deg);
+}
+
+/* 🔥 DANGER GLOW */
+body.danger .card {
+  box-shadow: 0 0 30px rgba(255,0,0,0.6);
+  animation: pulseDanger 1s infinite;
+}
+
+@keyframes pulseDanger {
+  0% { box-shadow: 0 0 10px rgba(255,0,0,0.4); }
+  50% { box-shadow: 0 0 40px rgba(255,0,0,1); }
+  100% { box-shadow: 0 0 10px rgba(255,0,0,0.4); }
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  #risk {
+    font-size: 26px;
   }
-}
-
-// ================= AUTO REFRESH =================
-setInterval(fetchData, 2000);
-fetchData();
-
-
-// ================= SIMULATION =================
-function simulate() {
-  fetch("/simulate");
-}
-
-
-// ================= RESET =================
-function resetSystem() {
-  fetch("/reset");
-}
-
-
-// ================= AI CHAT =================
-function askAI() {
-  let q = document.getElementById("question").value.toLowerCase();
-  let answer = "🤖 Analyzing...";
-
-  if (q.includes("why")) {
-    answer = "Risk increased due to unusual app behavior and high-risk permissions.";
-  } 
-  else if (q.includes("safe")) {
-    answer = "System is currently stable with low anomaly detection.";
-  } 
-  else if (q.includes("risk")) {
-    answer = "Risk score is calculated dynamically based on app behavior patterns.";
-  } 
-  else {
-    answer = "Try asking: 'Why risk?', 'Is it safe?', 'What happened?'";
-  }
-
-  document.getElementById("answer").innerText = answer;
-}
-
-
-// ================= ACTION =================
-function revokeAccess(appName) {
-  alert("🚫 " + appName + " access revoked!");
 }
