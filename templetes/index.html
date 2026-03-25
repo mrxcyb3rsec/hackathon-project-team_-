@@ -1,13 +1,110 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Hackathon Project</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trust Dashboard</title>
 
-<h1>Welcome to Our Hackathon Project 🚀</h1>
-<p>Team collaboration started!</p>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-dark text-white">
+
+<div class="container py-4">
+
+    <!-- 🔵 TITLE -->
+    <h2 class="text-center mb-4">🔐 Trust Dashboard</h2>
+
+    <!-- 🟢 TRUST SCORE -->
+    <div class="card text-center mb-4 bg-secondary">
+        <div class="card-body">
+            <h4>Trust Score</h4>
+            <h1 id="score">82%</h1>
+            <p>Status: <span class="text-success">Safe</span></p>
+        </div>
+    </div>
+
+    <!-- ⚠️ ALERTS -->
+    <div class="mb-4">
+        <h4>⚠️ Alerts</h4>
+        <div class="alert alert-warning">
+            Your location is shared with multiple apps
+        </div>
+        <div class="alert alert-danger">
+            One app has unused permission for 30 days
+        </div>
+    </div>
+
+    <!-- 📱 ACTIVE PERMISSIONS -->
+    <div class="mb-4">
+        <h4>📱 Active Permissions</h4>
+
+        <div class="row">
+
+            <div class="col-md-4">
+                <div class="card bg-secondary mb-3 p-2 app-card">
+                    <h5>Instagram</h5>
+                    <p>Access: Contacts, Photos</p>
+                    <button class="btn btn-danger btn-sm" onclick="revokeAccess('Instagram')">Revoke</button>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card bg-secondary mb-3 p-2 app-card">
+                    <h5>Google Maps</h5>
+                    <p>Access: Location</p>
+                    <button class="btn btn-danger btn-sm" onclick="revokeAccess('Google Maps')">Revoke</button>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card bg-secondary mb-3 p-2 app-card">
+                    <h5>Shopping App</h5>
+                    <p>Access: Location, Email</p>
+                    <button class="btn btn-danger btn-sm" onclick="revokeAccess('Shopping App')">Revoke</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 📊 DATA CATEGORIES -->
+    <div class="mb-4">
+        <h4>📊 Data Categories</h4>
+        <ul class="list-group">
+            <li class="list-group-item bg-secondary text-white">📍 Location - Shared with 3 apps</li>
+            <li class="list-group-item bg-secondary text-white">📞 Contacts - Shared with 2 apps</li>
+            <li class="list-group-item bg-secondary text-white">📸 Photos - Shared with 1 app</li>
+        </ul>
+    </div>
+
+    <!-- 🔌 CONNECTED SERVICES -->
+    <div class="mb-4">
+        <h4>🔌 Connected Services</h4>
+
+        <div class="card bg-secondary p-2 mb-2">
+            Google - Last accessed: 2 hours ago
+        </div>
+
+        <div class="card bg-secondary p-2 mb-2">
+            Instagram - Last accessed: 1 day ago
+        </div>
+    </div>
+
+    <!-- ⚡ QUICK ACTIONS -->
+    <div class="text-center">
+        <button class="btn btn-warning m-2">Pause Sharing</button>
+        <button class="btn btn-danger m-2">Revoke All</button>
+    </div>
+
+</div>
+
+<!-- JS -->
+<script src="script.js"></script>
 
 </body>
 </html>
