@@ -23,62 +23,30 @@
     <div class="card text-center mb-4 bg-secondary">
         <div class="card-body">
             <h4>Trust Score</h4>
-            <h1 id="score">82%</h1>
-            <p>Status: <span class="text-success">Safe</span></p>
+            <h1 id="score">Loading...</h1>
+            <p>Status: <span id="status" class="text-success">Checking...</span></p>
         </div>
     </div>
 
     <!-- ⚠️ ALERTS -->
     <div class="mb-4">
         <h4>⚠️ Alerts</h4>
-        <div class="alert alert-warning">
-            Your location is shared with multiple apps
-        </div>
-        <div class="alert alert-danger">
-            One app has unused permission for 30 days
-        </div>
+        <div id="alerts"></div>
     </div>
 
     <!-- 📱 ACTIVE PERMISSIONS -->
     <div class="mb-4">
         <h4>📱 Active Permissions</h4>
-
-        <div class="row">
-
-            <div class="col-md-4">
-                <div class="card bg-secondary mb-3 p-2 app-card">
-                    <h5>Instagram</h5>
-                    <p>Access: Contacts, Photos</p>
-                    <button class="btn btn-danger btn-sm" onclick="revokeAccess('Instagram')">Revoke</button>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card bg-secondary mb-3 p-2 app-card">
-                    <h5>Google Maps</h5>
-                    <p>Access: Location</p>
-                    <button class="btn btn-danger btn-sm" onclick="revokeAccess('Google Maps')">Revoke</button>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card bg-secondary mb-3 p-2 app-card">
-                    <h5>Shopping App</h5>
-                    <p>Access: Location, Email</p>
-                    <button class="btn btn-danger btn-sm" onclick="revokeAccess('Shopping App')">Revoke</button>
-                </div>
-            </div>
-
-        </div>
+        <div id="apps" class="row"></div>
     </div>
 
     <!-- 📊 DATA CATEGORIES -->
     <div class="mb-4">
         <h4>📊 Data Categories</h4>
         <ul class="list-group">
-            <li class="list-group-item bg-secondary text-white">📍 Location - Shared with 3 apps</li>
-            <li class="list-group-item bg-secondary text-white">📞 Contacts - Shared with 2 apps</li>
-            <li class="list-group-item bg-secondary text-white">📸 Photos - Shared with 1 app</li>
+            <li class="list-group-item bg-secondary text-white">📍 Location - Shared with multiple apps</li>
+            <li class="list-group-item bg-secondary text-white">📞 Contacts - Shared with multiple apps</li>
+            <li class="list-group-item bg-secondary text-white">📸 Photos - Shared with apps</li>
         </ul>
     </div>
 
@@ -87,11 +55,11 @@
         <h4>🔌 Connected Services</h4>
 
         <div class="card bg-secondary p-2 mb-2">
-            Google - Last accessed: 2 hours ago
+            Google - Last accessed recently
         </div>
 
         <div class="card bg-secondary p-2 mb-2">
-            Instagram - Last accessed: 1 day ago
+            Instagram - Last accessed recently
         </div>
     </div>
 
