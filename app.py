@@ -1,14 +1,12 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-import json
 
 app = Flask(__name__)
 CORS(app)
 
-# Load fake data
+# 🔹 Load fake data
 def load_data():
-    data = {
-        "trust_score": 78,
+    return {
         "apps": [
             {
                 "name": "Instagram",
@@ -36,43 +34,57 @@ def load_data():
             }
         ]
     }
-    return data
 
 
-# Generate alerts
-def generate_alerts(data):
+# 🔹 Calculate Trust Score dynamically
+def calculate_score(apps):
+    score = 100
+    for app in apps:
+        if app["risk"] == "High":
+            score -= 15
+        elif app["risk"] == "Medium":
+            score -= 8
+    return max(score, 0)
+
+
+# 🔹 Generate alerts
+def generate_alerts(apps):
     alerts = []
-    
-    high_risk_apps = [app for app in data["apps"] if app["risk"] == "High"]
+
+    high_risk_apps = [app for app in apps if app["risk"] == "High"]
 
     if len(high_risk_apps) > 1:
         alerts.append("⚠️ Multiple high-risk apps connected")
 
-    for app in data["apps"]:
+    for app in apps:
         if "Location" in app["permissions"]:
             alerts.append(f"📍 {app['name']} is accessing your location")
 
     return alerts
 
 
+# 🔹 API route
 @app.route("/data", methods=["GET"])
 def get_data():
     data = load_data()
-    alerts = generate_alerts(data)
+    apps = data["apps"]
 
-    response = {
-        "trust_score": data["trust_score"],
-        "apps": data["apps"],
+    score = calculate_score(apps)
+    alerts = generate_alerts(apps)
+
+    return jsonify({
+        "trust_score": score,
+        "apps": apps,
         "alerts": alerts
-    }
-
-    return jsonify(response)
+    })
 
 
+# 🔹 Home route (fixes "Cannot GET /")
 @app.route("/")
 def home():
-    return "Trust Dashboard Backend Running!"
+    return "🚀 Trust Dashboard Backend Running Successfully!"
 
 
+# 🔥 IMPORTANT FOR GITHUB CODESPACES
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
