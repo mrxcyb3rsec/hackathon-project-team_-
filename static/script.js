@@ -1,51 +1,29 @@
-// ===== TRUST SCORE CALCULATION =====
-function calculateTrustScore() {
-    let apps = document.querySelectorAll(".app-card");
-    let riskyApps = 0;
+fetch("http://127.0.0.1:5000/data")
+  .then(response => response.json())
+  .then(data => {
+    console.log(data);
 
-    apps.forEach(app => {
-        let risk = app.getAttribute("data-risk");
-        if (risk === "high") {
-            riskyApps++;
-        }
+    // Update Trust Score
+    document.getElementById("score").innerText = data.trust_score + "%";
+
+    // Alerts
+    let alertBox = document.getElementById("alerts");
+    alertBox.innerHTML = "";
+    data.alerts.forEach(alert => {
+      alertBox.innerHTML += `<div class="alert">${alert}</div>`;
     });
 
-    let score = 100 - (riskyApps * 15);
-
-    if (score < 0) score = 0;
-
-    document.getElementById("score").innerText = score + "%";
-}
-
-// ===== REVOKE ACCESS FUNCTION =====
-function revokeAccess(button) {
-    let card = button.parentElement;
-
-    // Remove the app card
-    card.remove();
-
-    alert("Access revoked successfully!");
-
-    // Recalculate score after removal
-    calculateTrustScore();
-}
-
-// ===== ALERT SYSTEM =====
-function checkAlerts() {
-    let apps = document.querySelectorAll(".app-card");
-    let alertBox = document.getElementById("alerts");
-
-    if (!alertBox) return;
-
-    if (apps.length > 4) {
-        alertBox.innerHTML = "⚠️ You have many apps connected. Review permissions!";
-    } else {
-        alertBox.innerHTML = "✅ Your data is under control.";
-    }
-}
-
-// ===== RUN WHEN PAGE LOADS =====
-window.onload = function () {
-    calculateTrustScore();
-    checkAlerts();
-};
+    // Apps
+    let appSection = document.getElementById("apps");
+    appSection.innerHTML = "";
+    data.apps.forEach(app => {
+      appSection.innerHTML += `
+        <div class="app-card">
+          <h3>${app.name}</h3>
+          <p>Permissions: ${app.permissions.join(", ")}</p>
+          <p>Risk: ${app.risk}</p>
+          <button onclick="revokeAccess('${app.name}')">Revoke</button>
+        </div>
+      `;
+    });
+  });
