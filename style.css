@@ -6,146 +6,146 @@
   font-family: 'Poppins', sans-serif;
 }
 
-/* ================= BACKGROUND MAGIC ================= */
+/* ================= ANIMATED BACKGROUND ================= */
 body {
-  background: radial-gradient(circle at 20% 20%, #0ea5e9, transparent 40%),
-              radial-gradient(circle at 80% 80%, #9333ea, transparent 40%),
-              linear-gradient(135deg, #020617, #0f172a);
-  color: #fff;
+  background: linear-gradient(-45deg, #e0f2fe, #fdf4ff, #f0f9ff, #ecfeff);
+  background-size: 400% 400%;
+  animation: gradientMove 12s ease infinite;
   min-height: 100vh;
-  overflow-x: hidden;
-  transition: all 0.6s ease;
+  color: #0f172a;
+  transition: all 0.4s ease;
 }
 
-/* 🔥 GLOW BLOBS */
-body::before, body::after {
+/* 🌈 Background animation */
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ================= FLOATING LIGHT BLOBS ================= */
+body::before,
+body::after {
   content: "";
   position: fixed;
-  width: 300px;
-  height: 300px;
+  width: 280px;
+  height: 280px;
   border-radius: 50%;
-  filter: blur(120px);
+  filter: blur(100px);
   z-index: -1;
 }
 
 body::before {
-  background: #22c55e;
-  top: 10%;
-  left: 10%;
+  background: #38bdf8;
+  top: 5%;
+  left: 5%;
 }
 
 body::after {
-  background: #3b82f6;
-  bottom: 10%;
-  right: 10%;
+  background: #c084fc;
+  bottom: 5%;
+  right: 5%;
 }
 
-/* ================= TITLE ================= */
+/* ================= TITLE (GRADIENT TEXT) ================= */
 h2 {
-  font-weight: 700;
   text-align: center;
-  letter-spacing: 1px;
-  text-shadow: 0 0 10px rgba(255,255,255,0.2);
+  font-weight: 800;
+  font-size: 28px;
+  background: linear-gradient(90deg, #2563eb, #9333ea);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* ================= GLASS CARD ================= */
 .card {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(18px);
   border-radius: 20px;
   padding: 20px;
   margin: 15px 0;
-  border: 1px solid rgba(255,255,255,0.15);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-  transition: all 0.4s ease;
+  border: 1px solid rgba(255,255,255,0.5);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  transition: all 0.35s ease;
 }
 
 .card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.15);
 }
 
-/* ================= RISK ================= */
-#risk {
+/* ================= TRUST + RISK ================= */
+#score {
   font-size: 36px;
   font-weight: bold;
-  text-shadow: 0 0 10px rgba(255,255,255,0.3);
+  color: #2563eb;
+}
+
+#risk {
+  font-size: 28px;
+  font-weight: bold;
 }
 
 /* ================= STATUS COLORS ================= */
 .text-success { color: #22c55e !important; }
-.text-warning { color: #facc15 !important; }
+.text-warning { color: #f59e0b !important; }
 .text-danger { color: #ef4444 !important; }
 
 /* ================= ALERT ================= */
 .alert {
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-  background: rgba(255, 0, 0, 0.15);
-  border: 1px solid rgba(255, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.7);
+  border-left: 5px solid #ef4444;
+  border-radius: 10px;
+  color: #1e293b;
   animation: fadeIn 0.5s ease;
 }
 
 /* ================= LIST ================= */
 .list-group-item {
-  background: rgba(255,255,255,0.05) !important;
+  background: rgba(255,255,255,0.75) !important;
   border-radius: 10px;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 
 /* ================= BUTTONS ================= */
 button {
   border-radius: 12px !important;
-  transition: 0.3s;
-  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+  font-weight: 500;
 }
 
 button:hover {
   transform: scale(1.08);
-  box-shadow: 0 0 15px rgba(255,255,255,0.3);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
 /* ================= INPUT ================= */
 input {
-  background: rgba(255,255,255,0.1) !important;
+  background: rgba(255,255,255,0.85) !important;
   border: none !important;
-  color: white !important;
 }
 
-/* ================= ANIMATIONS ================= */
+/* ================= FADE ================= */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ================= MODES ================= */
+/* ================= STATUS MODES ================= */
 body.safe {
-  filter: hue-rotate(120deg);
+  filter: hue-rotate(120deg) brightness(1.05);
 }
 
 body.warning {
-  filter: hue-rotate(40deg);
+  filter: hue-rotate(40deg) brightness(1.05);
 }
 
 body.danger {
-  filter: hue-rotate(0deg);
-}
-
-/* 🔥 DANGER GLOW */
-body.danger .card {
-  box-shadow: 0 0 30px rgba(255,0,0,0.6);
-  animation: pulseDanger 1s infinite;
-}
-
-@keyframes pulseDanger {
-  0% { box-shadow: 0 0 10px rgba(255,0,0,0.4); }
-  50% { box-shadow: 0 0 40px rgba(255,0,0,1); }
-  100% { box-shadow: 0 0 10px rgba(255,0,0,0.4); }
+  filter: hue-rotate(0deg) brightness(1.1);
 }
 
 /* ================= RESPONSIVE ================= */
 @media (max-width: 768px) {
-  #risk {
-    font-size: 26px;
-  }
+  #score { font-size: 28px; }
+  #risk { font-size: 22px; }
 }
