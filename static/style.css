@@ -1,0 +1,26 @@
+/* Applies to the entire body of the HTML document */
+body {
+  background-color: #f0f0f0; /* sets a light gray background color */
+  font-family: Arial, sans-serif; /* sets the default font for the body */
+  margin: 25px; /* adds space around the body content */
+}
+
+/* Applies to all <h1> elements */
+h1 {
+  color: blue; /* changes the text color to blue */
+  font-size: 35px; /* sets the font size */
+  border-bottom: 2px solid #ccc; /* adds a bottom border */
+  padding-bottom: 10px; /* adds space below the border */
+}
+
+/* Applies to all <p> elements */
+p {
+  color: #333; /* sets a dark gray text color */
+  line-height: 1.5; /* increases spacing between lines of text */
+}
+
+/* Applies to elements with the class "highlight" (e.g., <span class="highlight">) */
+.highlight {
+  background-color: yellow; /* sets a yellow background for the highlighted text */
+  font-weight: bold; /* makes the text bold */
+}
