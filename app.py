@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
-import os
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
@@ -37,8 +36,7 @@ def generate_alerts(apps):
 
     return alerts
 
-
-# 🔹 API
+# ✅ API
 @app.route("/data")
 def data():
     data = load_data()
@@ -50,18 +48,15 @@ def data():
         "alerts": generate_alerts(apps)
     })
 
-
-# 🔥 SERVE FRONTEND (THIS IS THE FIX)
+# 🔥 IMPORTANT: SERVE FRONTEND
 @app.route("/")
-def serve_index():
+def index():
     return send_from_directory(".", "index.html")
 
-
-# 🔥 OPTIONAL (for CSS + JS)
+# 🔥 IMPORTANT: SERVE JS + CSS
 @app.route("/<path:path>")
 def static_files(path):
     return send_from_directory(".", path)
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
