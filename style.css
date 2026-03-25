@@ -1,114 +1,124 @@
-/* RESET */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+// ================= API =================
+const API_URL = "/data";
+
+// 🔊 Alert Sound
+const alertSound = new Audio("https://www.soundjay.com/buttons/beep-01a.mp3");
+
+// ================= FETCH FUNCTION =================
+async function fetchData() {
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+
+    console.log(data);
+
+    // ================= TRUST + RISK =================
+    document.getElementById("score").innerText = data.trust_score + "%";
+    document.getElementById("risk").innerText = data.risk_score + "%";
+    document.getElementById("status").innerText = data.status;
+
+    const statusEl = document.getElementById("status");
+    const body = document.getElementById("body");
+
+    // ================= STATUS TEXT COLOR =================
+    if (data.status === "DANGER") {
+      statusEl.className = "text-danger";
+    } else if (data.status === "WARNING") {
+      statusEl.className = "text-warning";
+    } else {
+      statusEl.className = "text-success";
+    }
+
+    // ================= BACKGROUND MODE =================
+    body.classList.remove("safe", "warning", "danger");
+    body.classList.add(data.status.toLowerCase());
+
+    // 🔊 SOUND ONLY WHEN DANGER
+    if (data.status === "DANGER") {
+      alertSound.play();
+    }
+
+    // ================= ALERTS =================
+    let alertBox = document.getElementById("alerts");
+    alertBox.innerHTML = "";
+
+    data.alerts.forEach(alert => {
+      alertBox.innerHTML += `<div class="alert alert-warning">${alert}</div>`;
+    });
+
+    // ================= AI EXPLANATION =================
+    let reasonsList = document.getElementById("reasons");
+    reasonsList.innerHTML = "";
+
+    data.reasons.forEach(r => {
+      reasonsList.innerHTML += `<li class="list-group-item bg-dark text-white">${r}</li>`;
+    });
+
+    // ================= SYSTEM ACTION =================
+    document.getElementById("action").innerText = data.action;
+
+    // ================= APPS =================
+    let appSection = document.getElementById("apps");
+    appSection.innerHTML = "";
+
+    data.apps.forEach(app => {
+      appSection.innerHTML += `
+        <div class="col-md-4">
+          <div class="card bg-secondary text-white p-3 mb-3">
+            <h5>${app.name}</h5>
+            <p>Permissions: ${app.permissions.join(", ")}</p>
+            <p>Risk: ${app.risk}</p>
+            <button class="btn btn-danger btn-sm" onclick="revokeAccess('${app.name}')">Revoke</button>
+          </div>
+        </div>
+      `;
+    });
+
+  } catch (err) {
+    console.error("Error:", err);
+  }
 }
 
-/* BODY */
-body {
-  background: linear-gradient(135deg, #0f172a, #1e293b);
-  color: #fff;
-  min-height: 100vh;
+// ================= AUTO REFRESH =================
+setInterval(fetchData, 2000);
+fetchData();
+
+
+// ================= SIMULATION =================
+function simulate() {
+  fetch("/simulate");
 }
 
-/* HEADER */
-h1 {
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 28px;
-  font-weight: 600;
+
+// ================= RESET =================
+function resetSystem() {
+  fetch("/reset");
 }
 
-/* TRUST SCORE CIRCLE */
-.trust-score {
-  width: 160px;
-  height: 160px;
-  margin: 20px auto;
-  border-radius: 50%;
-  background: conic-gradient(#22c55e 0% 80%, #334155 80% 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
 
-.trust-score::before {
-  content: "";
-  position: absolute;
-  width: 120px;
-  height: 120px;
-  background: #0f172a;
-  border-radius: 50%;
-}
+// ================= AI CHAT =================
+function askAI() {
+  let q = document.getElementById("question").value.toLowerCase();
+  let answer = "🤖 Analyzing...";
 
-.trust-score span {
-  position: relative;
-  font-size: 24px;
-  font-weight: bold;
-}
-
-/* ALERT BOX */
-.alert {
-  background: rgba(255, 0, 0, 0.2);
-  border: 1px solid rgba(255, 0, 0, 0.5);
-  padding: 12px;
-  border-radius: 10px;
-  margin: 15px 0;
-}
-
-/* CARDS */
-.card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border-radius: 15px;
-  padding: 15px;
-  margin: 10px 0;
-  transition: 0.3s;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-}
-
-/* BUTTONS */
-button {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.revoke-btn {
-  background: #ef4444;
-  color: white;
-}
-
-.revoke-btn:hover {
-  background: #dc2626;
-}
-
-.safe-btn {
-  background: #22c55e;
-  color: white;
-}
-
-.safe-btn:hover {
-  background: #16a34a;
-}
-
-/* RESPONSIVE */
-@media (max-width: 600px) {
-  .trust-score {
-    width: 130px;
-    height: 130px;
+  if (q.includes("why")) {
+    answer = "Risk increased due to unusual app behavior and high-risk permissions.";
+  } 
+  else if (q.includes("safe")) {
+    answer = "System is currently stable with low anomaly detection.";
+  } 
+  else if (q.includes("risk")) {
+    answer = "Risk score is calculated dynamically based on app behavior patterns.";
+  } 
+  else {
+    answer = "Try asking: 'Why risk?', 'Is it safe?', 'What happened?'";
   }
 
-  .trust-score::before {
-    width: 95px;
-    height: 95px;
-  }
+  document.getElementById("answer").innerText = answer;
+}
+
+
+// ================= ACTION =================
+function revokeAccess(appName) {
+  alert("🚫 " + appName + " access revoked!");
 }
