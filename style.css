@@ -144,6 +144,17 @@ body.danger {
   filter: hue-rotate(0deg) brightness(1.1);
 }
 
+/* ================= APP CARD CHART ================= */
+.app-chart-container {
+  margin-top: 10px;
+  height: 150px;
+}
+
+canvas.app-chart {
+  width: 100% !important;
+  height: 150px !important;
+}
+
 /* ================= RESPONSIVE ================= */
 @media (max-width: 768px) {
   #score { font-size: 28px; }
