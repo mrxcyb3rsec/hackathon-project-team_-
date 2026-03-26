@@ -5,14 +5,10 @@ const API_URL = "/data";
 const alertSound = new Audio("https://www.soundjay.com/buttons/beep-01a.mp3");
 
 // ================= FETCH LOOP =================
-let appCharts = {}; // Store Chart.js instances per app
-
 async function fetchData() {
   try {
     const res = await fetch(API_URL);
     const data = await res.json();
-
-    console.log(data);
 
     // ================= TRUST + RISK =================
     document.getElementById("score").innerText = data.trust_score + "%";
@@ -52,60 +48,80 @@ async function fetchData() {
     // ================= ACTION =================
     document.getElementById("action").innerText = data.action;
 
-    // ================= APPS =================
+    // ================= APPS WITH CHART =================
     let appSection = document.getElementById("apps");
     appSection.innerHTML = "";
 
     data.apps.forEach(app => {
-      const appId = app.name.replace(/\s+/g, "_");
+      const chartId = `chart-${app.name.replace(/\s+/g, '-')}`;
+
       appSection.innerHTML += `
-        <div class="col-md-4">
+        <div class="col-md-6">
           <div class="card bg-secondary text-white p-3 mb-3">
             <h5>${app.name}</h5>
             <p>Permissions: ${app.permissions.join(", ")}</p>
             <p>Risk: ${app.risk}</p>
-            <button class="btn btn-danger btn-sm mb-2" onclick="revokeAccess('${app.name}')">Revoke</button>
-            <canvas id="chart_${appId}" height="150"></canvas>
+            <canvas id="${chartId}" height="100"></canvas>
+            <button class="btn btn-danger btn-sm mt-2" onclick="revokeAccess('${app.name}')">Revoke</button>
           </div>
         </div>
       `;
 
-      // Draw chart for each app
-      const ctx = document.getElementById(`chart_${appId}`).getContext('2d');
-      const labels = data.risk_history[app.name].map(d => d.date);
-      const values = data.risk_history[app.name].map(d => d.risk);
-
-      // Destroy old chart instance if exists
-      if (appCharts[appId]) appCharts[appId].destroy();
-
-      appCharts[appId] = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: `${app.name} Risk Over Time`,
-            data: values,
-            fill: true,
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderColor: app.name === "Hushh AI" ? 'rgba(0,255,0,0.7)' : 'rgba(255, 99, 132, 1)',
-            tension: 0.3
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: true },
-          },
-          scales: {
-            y: { min: 0, max: 100 }
-          }
-        }
-      });
+      // Draw or update chart
+      drawChart(chartId, data.risk_history[app.name]);
     });
 
   } catch (err) {
     console.error("Error:", err);
   }
+}
+
+// ================= CHARTS =================
+const chartMap = {}; // store Chart.js instances
+
+function drawChart(canvasId, history) {
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  const labels = history.map(h => h.date);
+  const data = history.map(h => h.risk);
+
+  if (chartMap[canvasId]) {
+    // Update existing chart
+    chartMap[canvasId].data.labels = labels;
+    chartMap[canvasId].data.datasets[0].data = data;
+    chartMap[canvasId].update();
+  } else {
+    // Create new chart
+    chartMap[canvasId] = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Risk Level',
+          data: data,
+          borderColor: appColor(canvasId),
+          backgroundColor: 'rgba(255,255,255,0.1)',
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { min: 0, max: 100 }
+        },
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+  }
+}
+
+// Assign colors to apps
+function appColor(canvasId) {
+  if (canvasId.includes("Hushh-AI")) return "#22c55e"; // safe green
+  return "#f59e0b"; // orange for other apps
 }
 
 // 🔁 AUTO REFRESH EVERY 2 SEC
