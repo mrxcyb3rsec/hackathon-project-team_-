@@ -1,118 +1,150 @@
-// ================= API =================
-const API_URL = "/data";
+from flask import Flask, jsonify, send_from_directory
+from flask_cors import CORS
+import random
+from datetime import datetime, timedelta
 
-// 🔊 Alert Sound
-const alertSound = new Audio("https://www.soundjay.com/buttons/beep-01a.mp3");
+app = Flask(__name__, static_folder='.', static_url_path='')
+CORS(app)
 
-// ================= FETCH LOOP =================
-async function fetchData() {
-  try {
-    const res = await fetch(API_URL);
-    const data = await res.json();
+# ================= GLOBAL STATES =================
+simulation_mode = False
+dynamic_risk = 40
 
-    console.log(data);
+# Per-app risk history storage (last 30 days)
+risk_history = {}
 
-    // ================= TRUST + RISK =================
-    document.getElementById("score").innerText = data.trust_score + "%";
-    document.getElementById("risk").innerText = data.risk_score + "%";
-    document.getElementById("status").innerText = data.status;
+# ================= DATA =================
+def load_data():
+    global risk_history
+    apps = [
+        {"name": "Instagram", "permissions": ["Contacts", "Photos"], "risk": "High", "last_accessed": "2 hours ago"},
+        {"name": "Google Maps", "permissions": ["Location"], "risk": "Medium", "last_accessed": "10 minutes ago"},
+        {"name": "Spotify", "permissions": ["Email"], "risk": "Low", "last_accessed": "1 day ago"},
+        {"name": "Shopping App", "permissions": ["Location", "Payment Info"], "risk": "High", "last_accessed": "5 hours ago"},
+        {"name": "Hushh AI", "permissions": ["Internal"], "risk": "Low", "last_accessed": "Always Safe"}
+    ]
 
-    // ================= STATUS COLOR =================
-    const statusEl = document.getElementById("status");
-    const body = document.getElementById("body");
+    now = datetime.now()
+    for app in apps:
+        if app["name"] not in risk_history:
+            history = []
+            for i in range(30):
+                day = now - timedelta(days=30 - i)
+                value = 5 if app["name"] == "Hushh AI" else random.randint(10, 40)
+                history.append({"date": day.strftime("%Y-%m-%d"), "risk": value})
+            risk_history[app["name"]] = history
 
-    if (data.status === "DANGER") {
-      statusEl.className = "text-danger";
-      body.style.background = "#2b0000";
-      alertSound.play();
-    } else if (data.status === "WARNING") {
-      statusEl.className = "text-warning";
-      body.style.background = "#2b2b00";
-    } else {
-      statusEl.className = "text-success";
-      body.style.background = "#001f1f";
-    }
+    return apps
 
-    // ================= ALERTS =================
-    let alertBox = document.getElementById("alerts");
-    alertBox.innerHTML = "";
+# ================= TRUST SCORE =================
+def calculate_score(apps):
+    score = 100
+    for app in apps:
+        if app["risk"] == "High":
+            score -= 15
+        elif app["risk"] == "Medium":
+            score -= 8
+    return max(score, 0)
 
-    data.alerts.forEach(alert => {
-      alertBox.innerHTML += `<div class="alert alert-warning">${alert}</div>`;
-    });
+# ================= ALERT SYSTEM =================
+def generate_alerts(apps):
+    alerts = []
+    high_risk = [a for a in apps if a["risk"] == "High"]
+    if len(high_risk) > 1:
+        alerts.append("⚠️ Multiple high-risk apps connected")
+    for app in apps:
+        if "Location" in app["permissions"]:
+            alerts.append(f"📍 {app['name']} is accessing your location")
+    return alerts
 
-    // ================= AI EXPLANATION =================
-    let reasonsList = document.getElementById("reasons");
-    reasonsList.innerHTML = "";
+# ================= AI EXPLANATION =================
+def generate_explanation(risk):
+    reasons = []
+    if risk > 50:
+        reasons.append("Unusual app behavior detected")
+    if risk > 65:
+        reasons.append("Multiple high-risk permissions active")
+    if risk > 80:
+        reasons.append("Critical threat pattern identified")
+    return reasons
 
-    data.reasons.forEach(r => {
-      reasonsList.innerHTML += `<li class="list-group-item bg-dark text-white">${r}</li>`;
-    });
+# ================= AUTO RESPONSE =================
+def auto_response(risk):
+    if risk > 80:
+        return "🔒 AUTO LOCK ACTIVATED"
+    elif risk > 60:
+        return "⚠️ RECOMMEND ENABLE MFA"
+    else:
+        return "✅ SYSTEM NORMAL"
 
-    // ================= ACTION =================
-    document.getElementById("action").innerText = data.action;
+# ================= UPDATE RISK HISTORY =================
+def update_risk_history(apps, dynamic_risk_val):
+    now = datetime.now().strftime("%Y-%m-%d")
+    for app in apps:
+        if app["name"] == "Hushh AI":
+            risk = 5
+        else:
+            if simulation_mode:
+                risk = min(100, random.randint(dynamic_risk_val, dynamic_risk_val + 15))
+            else:
+                risk = max(0, random.randint(dynamic_risk_val - 5, dynamic_risk_val + 10))
+        risk_history[app["name"]].append({"date": now, "risk": risk})
+        risk_history[app["name"]] = risk_history[app["name"]][-30:]
+    return risk_history
 
-    // ================= APPS =================
-    let appSection = document.getElementById("apps");
-    appSection.innerHTML = "";
+# ================= MAIN API =================
+@app.route("/data")
+def data():
+    global dynamic_risk, simulation_mode
+    apps = load_data()
+    trust_score = calculate_score(apps)
 
-    data.apps.forEach(app => {
-      appSection.innerHTML += `
-        <div class="col-md-4">
-          <div class="card bg-secondary text-white p-3 mb-3">
-            <h5>${app.name}</h5>
-            <p>Permissions: ${app.permissions.join(", ")}</p>
-            <p>Risk: ${app.risk}</p>
-            <button class="btn btn-danger btn-sm" onclick="revokeAccess('${app.name}')">Revoke</button>
-          </div>
-        </div>
-      `;
-    });
+    # 🔥 Dynamic Risk Engine
+    if simulation_mode:
+        dynamic_risk += random.randint(15, 30)
+    else:
+        dynamic_risk += random.randint(-5, 10)
+    dynamic_risk = max(0, min(100, dynamic_risk))
 
-  } catch (err) {
-    console.error("Error:", err);
-  }
-}
+    # Update per-app risk history
+    histories = update_risk_history(apps, dynamic_risk)
 
-// 🔁 AUTO REFRESH EVERY 2 SEC
-setInterval(fetchData, 2000);
-fetchData();
+    return jsonify({
+        "trust_score": trust_score,
+        "risk_score": dynamic_risk,
+        "status": "SAFE" if dynamic_risk < 50 else "WARNING" if dynamic_risk < 80 else "DANGER",
+        "apps": apps,
+        "alerts": generate_alerts(apps),
+        "reasons": generate_explanation(dynamic_risk),
+        "action": auto_response(dynamic_risk),
+        "risk_history": histories
+    })
 
+# ================= SIMULATION MODE =================
+@app.route("/simulate")
+def simulate():
+    global simulation_mode
+    simulation_mode = True
+    return jsonify({"message": "🚨 Attack Simulation Started"})
 
-// ================= SIMULATION =================
-function simulate() {
-  fetch("/simulate");
-}
+# ================= RESET =================
+@app.route("/reset")
+def reset():
+    global simulation_mode, dynamic_risk, risk_history
+    simulation_mode = False
+    dynamic_risk = 40
+    risk_history = {}
+    return jsonify({"message": "System Reset"})
 
-// ================= RESET =================
-function resetSystem() {
-  fetch("/reset");
-}
+# ================= FRONTEND =================
+@app.route("/")
+def index():
+    return send_from_directory(".", "index.html")
 
+@app.route("/<path:path>")
+def static_files(path):
+    return send_from_directory(".", path)
 
-// ================= AI CHAT =================
-function askAI() {
-  let q = document.getElementById("question").value.toLowerCase();
-  let answer = "🤖 Analyzing...";
-
-  if (q.includes("why")) {
-    answer = "Risk increased due to unusual app behavior and high-risk permissions.";
-  } 
-  else if (q.includes("safe")) {
-    answer = "System is currently stable with low anomaly detection.";
-  } 
-  else if (q.includes("risk")) {
-    answer = "Risk score is calculated dynamically based on app behavior patterns.";
-  } 
-  else {
-    answer = "Try asking: 'Why risk?', 'Is it safe?', 'What happened?'";
-  }
-
-  document.getElementById("answer").innerText = answer;
-}
-
-
-// ================= ACTION =================
-function revokeAccess(appName) {
-  alert("🚫 " + appName + " access revoked!");
-}
+# ================= RUN =================
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
